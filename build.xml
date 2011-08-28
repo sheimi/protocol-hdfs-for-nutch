@@ -1,0 +1,59 @@
+<project name="protocol-hdfs-for-nutch" default="dist" basedir=".">
+	<description>
+        build file of protocol-hdfs
+    </description>
+	<!-- set global properties for this build -->
+	
+	<property name="src" location="src" />
+	<property name="src.lib" location="lib" />
+	<property name="build.dir" location="build"/>
+	<property name="build.bin" location="${build.dir}/bin" />
+	<property name="build.dist" location="${build.dir}/dist" />
+	<property name="build.lib" location="${build.dir}/lib" />
+	<property name="user.name" value="sheimi" />
+
+	<path id="compile.classpath">
+		<pathelement location="${build.bin}"/>
+	    <fileset dir="${build.lib}">
+	      <include name="*.jar"/>
+	    </fileset>
+	  </path>
+	
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp />
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.dist}" />
+		<mkdir dir="${build.bin}" />
+		<mkdir dir="${build.lib}" />
+	    <copy  todir="${build.lib}">
+	      <fileset dir="${src.lib}"/>
+	    </copy>
+	</target>
+
+	<target name="compile" depends="init" description="compile the source ">
+		<!-- Compile the java code from ${src} into ${build} -->
+
+	    <javac srcdir="${src}" destdir="${build.bin}">
+	        <classpath refid="compile.classpath"/>
+	    </javac>
+	</target>
+
+	<target name="dist" depends="compile" description="generate the distribution">
+		<!-- Create the distribution directory -->
+		<mkdir dir="${build.dist}" />
+
+		<!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+		<manifest file="${build.dist}/MANIFEST.MF">
+			<attribute name="Built-By" value="${user.name}" />
+		</manifest>
+		<jar destfile="${build.dist}/protocol-hdfs.jar" basedir="${build.bin}" manifest="${build.dist}/MANIFEST.MF" />
+		<copy todir="${build.dist}" file="plugin.xml" />
+	</target>
+
+	<target name="clean" description="clean up">
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<delete dir="${build.dir}" />
+	</target>
+</project>
